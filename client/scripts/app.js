@@ -11,7 +11,6 @@ app.init = function(){
     if (!hasEvents) {
       $('#main').on('click','.username',function(event){
       app.handleUsernameClick(this.innerText.slice(1,-1));
-      // console.log(this.innerHTML);
     });
     }
     events = $._data(document.getElementById('send'), "events");
@@ -100,7 +99,6 @@ app.fetch = function(limit){
   });
 }
 app.clearMessages = function() {
-  console.log('ok');
   $( '#chats' ).empty();
 };
 app.renderMessage=function(message){
@@ -112,17 +110,22 @@ app.renderMessage=function(message){
   if (!app.friends.hasOwnProperty(message.username)) {
     app.friends[message.username]=false;
   }
-  
   var node = document.createElement('div');
   node.innerHTML = JSON.stringify(message.username).slice(1,-1)+':';
   node.className = 'username';
   $(chat).append(node);
+  
+  if ($(`#main .username:contains('${message.username}')`).length === 0) {
+    
+    let node2 = document.createElement('span');
+    node2.className = 'username';
+    node2.innerHTML = JSON.stringify(message.username)
+    $('#main .usernameList').append(node2);
+  }
+  
   // $('#chats').append(node);
   
-  let node2 = document.createElement('span');
-  node2.className = 'username';
-  node2.innerHTML = JSON.stringify(message.username)
-  $('#main .usernameList').append(node2);
+  
   
   node = document.createElement('div');
   node.innerHTML = JSON.stringify(message.text).slice(1,-1);
@@ -156,56 +159,37 @@ app.renderRoom=function(roomString){
   
 }
 app.handleUsernameClick=function(username){
-  console.log(12);
   if(app.friends[username]) {
     app.friends[username] = false;
     Array.prototype.forEach.call($(`#main .username:contains('${username}')`),function(item) {
-      console.log(item.classList);
       item.classList.add('friended');
     });
-    // $(`#main .username:contains('${username}')`).forEach((item)=>{
-    //   item.classList.remove('friended');
-    // });
     Array.prototype.forEach.call($(`#chats .username:contains('${username}')`),function(item) {
       item.classList.add('friended');
     });
-    // $(`#chat .username:contains('${username}')`).forEach((item)=>{
-    //   item.classList.remove('friended');
-    // });
   }else {
     
     app.friends[username] = true;
     Array.prototype.forEach.call($(`#main .username:contains('${username}')`),function(item){
-      console.log(2);
       item.classList.remove('friended');
     });
-    // $(`#main .username:contains('${username}')`).forEach((item)=>{
-    //   item.classList.add('friended');
-    // });
     Array.prototype.forEach.call($(`#chats :contains('${username}')`),function(item){
       item.classList.remove('friended');
     });
-    // $(`#chat .username:contains('${username}')`).forEach((item)=>{
-    //   item.classList.add('friended');
-    // });
+
   }
-  
-    // if (app.friends[message.username]) {
-      // node.classList.add('friended');
-      
-    // }
+
 };
 
 app.handleSubmit=function(){
   var message = {
     username: window.location.search.slice(window.location.search.indexOf('username=')+9),
     text: $('#message').val(),
-    roomname: $('#roomSelect').val()
+    roomname: $('#roomset').val()
   }
   app.send(message);
   setTimeout(app.fetch.bind(null,100),500);
 };
 app.clearUsername = function() {
-  console.log('ok');
   $( '#main .usernameList' ).empty();
 };
