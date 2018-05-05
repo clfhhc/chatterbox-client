@@ -14,8 +14,11 @@ app.init = function(){
     }
     events = $._data(document.getElementById('send'), "events");
     hasEvents = (events != null);
+    console.log(1);
     if (!hasEvents) {
-      $('#send').on('submit','.submit',function(){
+      $('#send').on('submit',function(event){
+      event.preventDefault();
+      console.log(2);
       $('#message').val().length>0 && app.handleSubmit();
       //console.log('hi');
     });
@@ -48,6 +51,11 @@ app.fetch = function(){
     type: 'GET',
     //data: ,
     contentType: 'application/json',
+    data: {
+      limit: 25,
+      order: '-createdAt'
+      
+        },
     success: function (data) {
       console.log('chatterbox: Message fetched');
       console.log(data.results);
