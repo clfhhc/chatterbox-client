@@ -72,9 +72,12 @@ form input[type=text] {
 }
 
 .chat .username {
-    font-weight: 800;
+    font-weight: 400;
 }
 
+.chat .friended {
+    font-weight: bold;
+}
 .chat:hover {
     background-color: #ddd;
 }
@@ -94,3 +97,6 @@ form input[type=text] {
     background-color: #0090da;
 }
 
+.time {
+    font-size: 10px;
+}
