@@ -4,6 +4,7 @@ var app = {};
 app.server = 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages';
 app.data=[];
 app.rooms={};
+app.friends={};
 app.init = function(){
     let events = $._data(document.getElementById('main'), "events");
     let hasEvents = (events != null);
@@ -23,7 +24,7 @@ app.init = function(){
       //console.log('hi');
     });
     }
-    
+    app.fetch(50);
 };
 
 app.send = function(message){
@@ -44,7 +45,7 @@ app.send = function(message){
   });
 };
 
-app.fetch = function(){
+app.fetch = function(limit){
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: app.server,
@@ -52,24 +53,30 @@ app.fetch = function(){
     //data: ,
     contentType: 'application/json',
     data: {
-      limit: 25,
+      limit: limit,
       order: '-createdAt'
       
         },
     success: function (data) {
       console.log('chatterbox: Message fetched');
-      console.log(data.results);
-      app.data.push(...data.results);
+      app.data=data.results;
       for (var i = 0; i < data.results.length; i++) {
-        console.log(data.results[i].updatedAt);
-        if (data.results[i].hasOwnProperty('roomname')) {
-          if (app.rooms.hasOwnProperty(data.results[i].roomname)) {
-            app.rooms[data.results[i].roomname].push(data.results[i]);
-          } else {
-            app.rooms[data.results[i].roomname]= [data.results[i]];
+        if (data.results[i].roomname) {
+          if (data.results[i].username) {
+            if (data.results[i].hasOwnProperty('roomname')) {
+              if (app.rooms.hasOwnProperty(data.results[i].roomname)) {
+                app.rooms[data.results[i].roomname].push(data.results[i]);
+              } else {
+                app.rooms[data.results[i].roomname]= [data.results[i]];
+              }
+            }
+            app.renderMessage(data.results[i]);
           }
+          
         }
+        
       }
+      app.renderRoom();
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -82,17 +89,35 @@ app.clearMessages = function() {
 };
 app.renderMessage=function(message){
   var node = document.createElement('div');
-  node.innerHTML = JSON.stringify(message.text);
+  console.log(JSON.stringify(message.username));
+  node.innerHTML = JSON.stringify(message.username).slice(1,-1)+':';
   $('#chats').append(node);
-  var node2 = document.createElement('div');
-  node2.className = 'username';
-  $('#main').append(node2);
+  node = document.createElement('div');
+  node.innerHTML = JSON.stringify(message.text).slice(1,-1);
+  $('#chats').append(node);
+  
+  if (message.username) {
+    if (!app.friends.hasOwnProperty(message.username)) {
+      app.friends[message.username]=false;
+      var node = document.createElement('span');
+      node.className = 'username';
+      node.innerHTML = JSON.stringify(message.username)
+      $('#main').append(node);
+    }
+  }
+  
+  
 };
 
 app.renderRoom=function(roomString){
-  var node = document.createElement('div');
-  node.innerHTML = JSON.stringify(roomString).slice(1,-1);
-  $('#roomSelect').append(node);
+  $( '#roomSelect' ).empty();
+  for (let room of Object.keys(app.rooms)) {
+    let node = document.createElement('option');
+    node.innerHTML = room;
+    node.value = room;
+    $('#roomSelect').append(node);
+  }
+  
 }
 app.handleUsernameClick=function(){
   
