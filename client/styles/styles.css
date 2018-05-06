@@ -44,8 +44,14 @@ body {
     float: right;
     clear: right;
     display: inline-block;
+    padding: 5px;
+    margin-bottom: 5px;
+    background-color: #eee;
 }
 
+#main .friended {
+    font-weight: bold;
+}
 #main .success code {
     font-size: 12px;
     color: green;
@@ -69,6 +75,7 @@ form input[type=text] {
     padding: 5px;
     margin-bottom: 5px;
     background-color: #eee;
+    word-wrap: break-word;
 }
 
 .chat .username {
