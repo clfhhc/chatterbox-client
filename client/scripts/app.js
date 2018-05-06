@@ -44,12 +44,11 @@ app.init = function() {
 };
 
 app.send = function(message) {
-  console.log(message);
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: app.server,
     type: 'POST',
-    data: message,
+    data: JSON.stringify(message), //make sure the request body is stringified
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message sent');
@@ -83,7 +82,7 @@ app.fetch = function(limit) {
         if (data.results[i].username) {
           
           if (data.results[i].roomname) {
-          
+            //escape the messages we fetched
             data.results[i].text = escape(data.results[i].text).slice(undefined, 200);
             data.results[i].username = escape(data.results[i].username).slice(undefined, 20);
             data.results[i].roomname = escape(data.results[i].roomname).slice(undefined, 20);
@@ -99,8 +98,9 @@ app.fetch = function(limit) {
             }
           }
         }
-        
       }
+      
+      
       let roomname = $('#roomSelect').val();
       app.renderRoom();
       if (app.rooms.hasOwnProperty(roomname)) {
@@ -162,6 +162,7 @@ app.renderMessageBaseOnRoom = function(roomname) {
     }
   }
 };
+
 app.renderRoom = function(roomString) {
   $( '#roomSelect' ).empty();
   for (let room of Object.keys(app.rooms)) {
@@ -170,8 +171,8 @@ app.renderRoom = function(roomString) {
     node.value = room;
     $('#roomSelect').append(node);
   }
-  
 };
+
 app.handleUsernameClick = function(username) {
   if (app.friends[username]) {
     app.friends[username] = false;
